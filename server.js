@@ -12,7 +12,7 @@ const cache = {};
 
 // POSTGRES
 const pg = require('pg');
-let DATABASE_URL = 'postgres://@localhost:5432/demo';
+let DATABASE_URL = 'postgres://@localhost:5432/city-explorer';
 const client = new pg.Client(DATABASE_URL);
 client.on('error', err => console.error('pg probs', err));
 
@@ -28,13 +28,9 @@ app.use(cors());
 // Home page route for server testing
 
 app.get('/sql', (request, response) => {
-  let SQL = 'SELECT * FROM shapes;';
-  let results = client.query(SQL)
-    .then(data => {
-      // console.log(data.rows);
-      response.send(data.rows);
-    })
+
 })
+
 app.get('/', (request, response) => {
   response.send('home page!!!!');
 });
@@ -47,17 +43,29 @@ app.get('/events', eventsHandler);
 // Location Functions
 function locationHandler(request, response) {
   let city = request.query.city;
+  let SQL = `SELECT * FROM locations WHERE city=${city};`;
+
 
   //CACHE if location is cache, return location
-  if (cache[city]) { // if select * from cityexp where city = request.query.city
-    // return location object send to client
-    let cacheLocation = cache[city]; // result of the query;
-    response.send(cacheLocation);
-    // else hit api cahce location INSERT INTO statement, return location object
-  } else {
+  if (client.query(SQL)) {
+
+    // let locationsQuery = `SELECT * FROM locations WHERE city=${city};`; //to check if there's something there
+    .then(data => {
+      // console.log(data.rows);
+      response.send(SQL);
+    })
+    .catch(err => console.error(err));
+  
+  // if select * from cityexp where city = request.query.city
+  // return location object send to client
+  // let cachedLocation = cache[city]; // result of the query;
+  // response.send(cachedLocation);
+  // else hit api cahce location INSERT INTO statement, return location object) {
+
+   } else {
 
     try {
-    // //Getting info for object
+      // //Getting info for object
       let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json&limit=1`;
 
       superagent.get(url)
@@ -108,7 +116,7 @@ function weatherHandler(request, response) {
 
 function Weather(weatherObj) {
   this.forecast = weatherObj.summary
-  this.time = new Date(weatherObj.time *1000).toString().slice(0, 15);
+  this.time = new Date(weatherObj.time * 1000).toString().slice(0, 15);
 }
 
 // End Weather Functions
@@ -154,7 +162,7 @@ function Event(eventsObj) {
 // ***This must be at the end of the file***
 
 client.connect()
-  .then( () => {
+  .then(() => {
     app.listen(PORT, () => {
       console.log(`Server up on port ${PORT}`);
     })

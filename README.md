@@ -80,3 +80,26 @@ Start time: 7:30pm
 Finish time: 9:30pm
 
 Actual time needed to complete: 2 hours
+
+## Lab-08
+
+Number and name of feature: #5 - Database Set-up
+
+Estimate of time needed to complete: 1 hour
+
+Start time: 2:15pm
+
+Finish time: 2:40pm
+
+Actual time needed to complete: 0:25
+
+
+Number and name of feature: #6 - Server
+
+Estimate of time needed to complete: 1 hour
+
+Start time: 2:50pm
+
+Finish time: pm
+
+Actual time needed to complete: 
