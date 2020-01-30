@@ -44,11 +44,13 @@ app.get('/events', eventsHandler);
 
 function locationHandler (request, response) {
   let city = request.query.city;
-  let SQL = `SELECT * FROM locations WHERE city = '${city}';`;
+  console.log('from location handler: ', request.query);
+  let SQL = `SELECT * FROM locations WHERE search_query = '${city}';`;
   // No more cache stuff
   client.query(SQL)
     .then(results => {
       if (results.rows.length > 0) {
+        console.log('from database: ', results.rows[0]);
         response.send(results.rows[0]);
       } else {
         try {
@@ -60,7 +62,7 @@ function locationHandler (request, response) {
               const geoData = data.body[0]; //first item
               const location = new Location(city, geoData);
               const {search_query, formatted_query, latitude, longitude} = location;
-              let insertSql = `INSERT INTO locations (city, formattedquery, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
+              let insertSql = `INSERT INTO locations (search_query, formattedquery, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
               // Below replaces city cache thing
               client.query(insertSql);
               response.send(location);
@@ -121,17 +123,21 @@ function Weather(weatherObj) {
 // ***EVENTS START HERE***
 
 function eventsHandler(request, response) {
-  // const latitude = request.query.latitude;
-  // const longitude = request.query.longitude;
+  console.log('from events handler: ', request.query);
   const { search_query } = request.query;
   let eventurl = `http://api.eventful.com/json/events/search?location=${search_query}&app_key=${process.env.EVENTFUL_API_KEY}&within=7&date=Future&page_size=20`;
 
   superagent.get(eventurl)
     .then(data => {
+      // console.log(data);
       let dataObj = JSON.parse(data.text).events.event;
       let eventsArray = dataObj.map(object => new Event(object));
+      // console.log(eventsArray);
       response.send(eventsArray);
-    });
+    })
+    .catch (() => {
+      errorHandler('something went wrong', request, response);
+    })
 }
 
 
