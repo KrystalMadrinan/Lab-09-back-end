@@ -103,3 +103,15 @@ Start time: 2:50pm
 Finish time: pm
 
 Actual time needed to complete: 
+
+
+Number and name of feature: #6 - Deploy
+
+Estimate of time needed to complete: 
+
+Start time: 
+
+Finish time: 
+
+Actual time needed to complete: 
+
