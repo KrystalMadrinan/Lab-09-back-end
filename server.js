@@ -62,7 +62,7 @@ function locationHandler (request, response) {
               const geoData = data.body[0]; //first item
               const location = new Location(city, geoData);
               const {search_query, formatted_query, latitude, longitude} = location;
-              let insertSql = `INSERT INTO locations (search_query, formattedquery, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
+              let insertSql = `INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
               // Below replaces city cache thing
               client.query(insertSql);
               response.send(location);
