@@ -7,7 +7,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
-const cache = {};
+// const cache = {};
 
 
 // POSTGRES
@@ -25,14 +25,9 @@ app.use(cors());
 
 // ROUTES
 // route syntax = app.<operation>('route', callback);
-// Home page route for server testing
-
-app.get('/sql', (request, response) => {
-
-})
 
 app.get('/', (request, response) => {
-  response.send('home page!!!!');
+  response.send('Proof of life');
 });
 app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
@@ -40,49 +35,46 @@ app.get('/events', eventsHandler);
 // app.get('/yelp', yelpHandler);
 // app.get('/movies', moviesHandler);
 
-// Location Functions
-function locationHandler(request, response) {
+// ***ROUTES END HERE***
+
+
+
+
+// ***LOCATION STARTS HERE***
+
+function locationHandler (request, response) {
   let city = request.query.city;
-  let SQL = `SELECT * FROM locations WHERE city=${city};`;
+  let SQL = `SELECT * FROM locations WHERE city = '${city}';`;
+  // No more cache stuff
+  client.query(SQL)
+    .then(results => {
+      if (results.rows.length > 0) {
+        response.send(results.rows[0]);
+      } else {
+        try {
+          // Getting info for object
+          let locationUrl = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json&limit=1`;
 
-
-  //CACHE if location is cache, return location
-  if (client.query(SQL)) {
-
-    // let locationsQuery = `SELECT * FROM locations WHERE city=${city};`; //to check if there's something there
-    .then(data => {
-      // console.log(data.rows);
-      response.send(SQL);
-    })
-    .catch(err => console.error(err));
-  
-  // if select * from cityexp where city = request.query.city
-  // return location object send to client
-  // let cachedLocation = cache[city]; // result of the query;
-  // response.send(cachedLocation);
-  // else hit api cahce location INSERT INTO statement, return location object) {
-
-   } else {
-
-    try {
-      // //Getting info for object
-      let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json&limit=1`;
-
-      superagent.get(url)
-        .then(data => {
-          const geoData = data.body[0]; //first item
-          const location = new Location(city, geoData);
-          //let sql= 'your insert into statment goes here;';
-          //pg.query(SQL goes here)
-          cache[city] = location;
-          response.send(location);
-        })
-
-    } catch (error) {
-      errorHandler('it went wrong.', request, response);
-    }
-  }
+          superagent.get(locationUrl)
+            .then(data => {
+              const geoData = data.body[0]; //first item
+              const location = new Location(city, geoData);
+              const {search_query, formatted_query, latitude, longitude} = location;
+              let insertSql = `INSERT INTO locations (city, formattedquery, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
+              // Below replaces city cache thing
+              client.query(insertSql);
+              response.send(location);
+            })
+            .catch(() => {
+              errorHandler('not found', request, response);
+            });
+        } catch (error) {
+          errorHandler(error, request, response);
+        }
+      }
+    });
 }
+
 
 // Location Object Constructor
 function Location(city, geoData) {
@@ -92,21 +84,24 @@ function Location(city, geoData) {
   this.longitude = geoData.lon;
 }
 
-// End Location Functions
-// Begin Weather Functions
+// ***LOCATION ENDS HERE***
+
+
+
+
+// ***WEATHER STARTS HERE***
 
 function weatherHandler(request, response) {
   try {
     const latitude = request.query.latitude;
     const longitude = request.query.longitude;
     let weatherURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
-    // console.log(weatherURL);
 
     superagent.get(weatherURL)
       .then(data => {
         const forecastArray = data.body.daily.data.map(object => new Weather(object));
         response.send(forecastArray);
-      })
+      });
   } catch (error) {
     errorHandler('something went wrong', request, response);
   }
@@ -118,35 +113,28 @@ function Weather(weatherObj) {
   this.forecast = weatherObj.summary
   this.time = new Date(weatherObj.time * 1000).toString().slice(0, 15);
 }
+// ***WEATHER ENDS HERE***
 
-// End Weather Functions
-// Begin Events Functions
+
+
+
+// ***EVENTS START HERE***
 
 function eventsHandler(request, response) {
-  try {
-    const latitude = request.query.latitude;
-    const longitude = request.query.longitude;
-    let eventurl = `http://api.eventful.com/json/events/search?app_key=${process.env.EVENTFUL_API_KEY}&keywords=books&where=${latitude},${longitude}&within=7&date=Future&page_size=20`;
-    console.log(eventurl);
+  // const latitude = request.query.latitude;
+  // const longitude = request.query.longitude;
+  const { search_query } = request.query;
+  let eventurl = `http://api.eventful.com/json/events/search?location=${search_query}&app_key=${process.env.EVENTFUL_API_KEY}&within=7&date=Future&page_size=20`;
 
-    superagent.get(eventurl)
-      .then(data => {
-        console.log('test');
-        let obj = JSON.parse(data.text);
-        let parsedObj = obj.events.event;
-        console.log(parsedObj);
-        let eventsarray = parsedObj.map(object => new Event(object));
-        response.send(eventsarray);
-      })
-  } catch (error) {
-    errorHandler('something went wrong', request, response);
-  }
+  superagent.get(eventurl)
+    .then(data => {
+      let dataObj = JSON.parse(data.text).events.event;
+      let eventsArray = dataObj.map(object => new Event(object));
+      response.send(eventsArray);
+    });
 }
 
-// Error Handler
-function errorHandler(error, request, response) {
-  response.status(500).send(error);
-}
+
 
 // Events Constructor
 function Event(eventsObj) {
@@ -156,7 +144,16 @@ function Event(eventsObj) {
   this.summary = eventsObj.description;
 }
 
-// End Events Functions
+
+
+
+// Error Handler
+
+function errorHandler(error, request, response) {
+  response.status(500).send(error);
+}
+
+// END EVENTS FUNCTIONS
 
 // Ensure the server is listening for requests
 // ***This must be at the end of the file***
@@ -167,5 +164,3 @@ client.connect()
       console.log(`Server up on port ${PORT}`);
     })
   })
-// app.listen(PORT, () => console.log(`Server up on port ${PORT}`));
-
