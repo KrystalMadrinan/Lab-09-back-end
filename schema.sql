@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS locations, weather, events;
 
 CREATE TABLE locations (
     id SERIAL PRIMARY KEY,
-    city VARCHAR(100),
+    search_query VARCHAR(100),
     formattedquery VARCHAR(100),
     latitude float,
     longitude float
