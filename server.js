@@ -43,7 +43,7 @@ app.get('/movies', moviesHandler);
 
 // ***LOCATION STARTS HERE***
 
-function locationHandler (request, response) {
+function locationHandler(request, response) {
   let city = request.query.city;
   console.log('from location handler: ', request.query);
   let SQL = `SELECT * FROM locations WHERE search_query = '${city}';`;
@@ -62,7 +62,7 @@ function locationHandler (request, response) {
             .then(data => {
               const geoData = data.body[0]; //first item
               const location = new Location(city, geoData);
-              const {search_query, formatted_query, latitude, longitude} = location;
+              const { search_query, formatted_query, latitude, longitude } = location;
               let insertSql = `INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ('${search_query}', '${formatted_query}', '${latitude}', '${longitude}');`;
               // Below replaces city cache thing
               client.query(insertSql);
@@ -137,7 +137,7 @@ function eventsHandler(request, response) {
       // console.log(eventsArray);
       response.send(eventsArray);
     })
-    .catch (() => {
+    .catch(() => {
       errorHandler('something went wrong', request, response);
     })
 }
@@ -159,18 +159,24 @@ function Event(eventsObj) {
 
 // ***MOVIES START HERE***
 
-function moviesHandler (request, response) {
+function moviesHandler(request, response) {
+  let city = request.query.search_query;
   let moviesUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&page=1&query=${city}`;
 
   superagent.get(moviesUrl)
-  .then(data =>{
-    let moviesArr = 
-  })
-  }
-
-
-
+    .then(data => {
+      let moviesArr = data.body.results.map((object => new Movies(object)));
+      response.send(moviesArr);
+      console.log(moviesArr);
+    })
+    .catch(() => {
+      errorHandler('something went wrong', request, response);
+    })
 }
+
+
+
+
 
 
 
@@ -182,8 +188,8 @@ function Movies(moviesObj) {
   this.overview = moviesObj.overview;
   this.average_votes = moviesObj.vote_average;
   this.total_votes = moviesObj.vote_count;
-  this.image_url = moviesObj.poster_path;
-  this.popularity = moviesObj.popularity ;
+  this.image_url = `https://image.tmdb.org/t/p/w500${moviesObj.poster_path}`;
+  this.popularity = moviesObj.popularity;
   this.released_on = moviesObj.release_date;
 }
 
