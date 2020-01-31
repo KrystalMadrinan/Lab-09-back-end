@@ -100,7 +100,7 @@ Estimate of time needed to complete: 1 hour
 
 Start time: 2:50pm
 
-Finish time: pm
+Finish time: a couple days
 
 Actual time needed to complete: 
 
@@ -115,3 +115,37 @@ Finish time:
 
 Actual time needed to complete: 
 
+
+## Lab-09
+
+Number and name of feature: #7 - Movies
+
+Estimate of time needed to complete: 
+
+Start time: 
+
+Finish time: 
+
+Actual time needed to complete: 
+
+
+Number and name of feature: #8 - Yelp
+
+Estimate of time needed to complete: 
+
+Start time: 
+
+Finish time: 
+
+Actual time needed to complete: 
+
+
+Number and name of feature: #9 - Refactor 
+
+Estimate of time needed to complete: 
+
+Start time: 
+
+Finish time: 
+
+Actual time needed to complete: 
