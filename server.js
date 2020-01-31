@@ -33,7 +33,7 @@ app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
 app.get('/events', eventsHandler);
 app.get('/movies', moviesHandler);
-// app.get('/yelp', yelpHandler);
+app.get('/yelp', yelpHandler);
 
 
 // ***ROUTES END HERE***
@@ -173,8 +173,6 @@ function moviesHandler(request, response) {
       errorHandler('something went wrong', request, response);
     })
 }
-
-
 
 
 
