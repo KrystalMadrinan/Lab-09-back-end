@@ -120,13 +120,13 @@ Actual time needed to complete:
 
 Number and name of feature: #7 - Movies
 
-Estimate of time needed to complete: 
+Estimate of time needed to complete: 2 hours
 
-Start time: 
+Start time: 5 pm
 
-Finish time: 
+Finish time: 8:30 pm
 
-Actual time needed to complete: 
+Actual time needed to complete: 3.5 hours
 
 
 Number and name of feature: #8 - Yelp
