@@ -32,8 +32,9 @@ app.get('/', (request, response) => {
 app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
 app.get('/events', eventsHandler);
+app.get('/movies', moviesHandler);
 // app.get('/yelp', yelpHandler);
-// app.get('/movies', moviesHandler);
+
 
 // ***ROUTES END HERE***
 
@@ -115,6 +116,7 @@ function Weather(weatherObj) {
   this.forecast = weatherObj.summary
   this.time = new Date(weatherObj.time * 1000).toString().slice(0, 15);
 }
+
 // ***WEATHER ENDS HERE***
 
 
@@ -149,6 +151,43 @@ function Event(eventsObj) {
   this.event_date = eventsObj.start_time;
   this.summary = eventsObj.description;
 }
+
+// ***EVENTS END HERE***
+
+
+
+
+// ***MOVIES START HERE***
+
+function moviesHandler (request, response) {
+  let moviesUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&page=1&query=${city}`;
+
+  superagent.get(moviesUrl)
+  .then(data =>{
+    let moviesArr = 
+  })
+  }
+
+
+
+}
+
+
+
+
+// Movies Constructor Function
+
+function Movies(moviesObj) {
+  this.title = moviesObj.title;
+  this.overview = moviesObj.overview;
+  this.average_votes = moviesObj.vote_average;
+  this.total_votes = moviesObj.vote_count;
+  this.image_url = moviesObj.poster_path;
+  this.popularity = moviesObj.popularity ;
+  this.released_on = moviesObj.release_date;
+}
+
+
 
 
 
