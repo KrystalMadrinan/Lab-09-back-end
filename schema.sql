@@ -1,3 +1,5 @@
+-- Thoomas S
+
 -- one for each api
 -- varchar is max characters, variable length
 -- numeric(p,s) # of digits stored to the left and to the right of the decimal point
