@@ -1,6 +1,8 @@
 # City Explorer
+Thomas S
 
-**Author**: Krystal Madrinan, Thomas Tilahun, Cas Olejniczak
+**Author**: Krystal Madrinan, Thomas Tilahun, Cas Olejniczak, Thomas Sherer
+
 **Version**: 1.1.0 
 
 ## Overview
@@ -130,14 +132,15 @@ Actual time needed to complete: 3.5 hours
 
 
 Number and name of feature: #8 - Yelp
+With HUGE help from Cory Henderson (Major Props, Cory!)
 
-Estimate of time needed to complete: 
+Estimate of time needed to complete: 3 hrs.
 
-Start time: 
+Start time: 2100
 
-Finish time: 
+Finish time: 2144
 
-Actual time needed to complete: 
+Actual time needed to complete: 45  min.
 
 
 Number and name of feature: #9 - Refactor 

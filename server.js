@@ -1,4 +1,5 @@
 'use strict';
+// Thomas S
 
 // Load environment variables from the .env
 require('dotenv').config();
@@ -12,7 +13,7 @@ const superagent = require('superagent');
 
 // POSTGRES
 const pg = require('pg');
-let DATABASE_URL = 'postgres://@localhost:5432/city-explorer';
+let DATABASE_URL = process.env.DATABASE_URL;
 const client = new pg.Client(DATABASE_URL);
 client.on('error', err => console.error('pg probs', err));
 
@@ -156,7 +157,6 @@ function Event(eventsObj) {
 
 
 
-
 // ***MOVIES START HERE***
 
 function moviesHandler(request, response) {
@@ -176,9 +176,6 @@ function moviesHandler(request, response) {
 
 
 
-
-
-
 // Movies Constructor Function
 
 function Movies(moviesObj) {
@@ -195,6 +192,38 @@ function Movies(moviesObj) {
 
 
 
+// ***YELP STARTS HERE***
+
+
+function yelpHandler(request, response) {
+  let lat = request.query.latitude;
+  let lon = request.query.longitude;
+  let yelpUrl = `https://api.yelp.com/v3/businesses/search?term=restaurants&latitude=${lat}&longitude=${lon}&limit=20`;
+
+  superagent.get(yelpUrl).set('Authorization',`Bearer ${process.env.YELP_API_KEY}`)
+    .then(data => {
+      console.log(data);
+      let yelpArr = data.body.businesses.map((object => new YelpList(object)));
+      response.send(yelpArr);
+      console.log(yelpArr);
+    })
+    .catch(() => {
+      errorHandler('something went wrong', request, response);
+    })
+}
+
+
+
+// Yelp Constructor Function
+
+function YelpList(object) {
+  this.name = object.name;
+  this.image_url = object.image_url;
+  this.price= object.price;
+  this.rating= object.rating;
+  this.url= object.url
+}
+
 
 // Error Handler
 
@@ -202,7 +231,7 @@ function errorHandler(error, request, response) {
   response.status(500).send(error);
 }
 
-// END EVENTS FUNCTIONS
+
 
 // Ensure the server is listening for requests
 // ***This must be at the end of the file***
